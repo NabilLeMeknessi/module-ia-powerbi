@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Module IA - Power BI e-learning</title>
+    <link rel="stylesheet" href="/static/style.css?v=4" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div class="brand">
+          <img class="logo" src="/static/logo.png" alt="Logo" />
+          <div class="brand-text">
+            <h1>Module IA d’aide à la décision</h1>
+            <p class="subtitle">Analyse d’une page Power BI e-learning Moodle et génération d’un PDF professionnel.</p>
+          </div>
+        </div>
+        <div class="actions">
+          <a class="btn" href="/strategic" style="background: linear-gradient(180deg, rgba(26,58,92,0.95), rgba(15,35,60,0.95)); border-color: rgba(26,58,92,0.30);">
+            Rapport Stratégique
+          </a>
+        </div>
+      </header>
+
+      <section class="card">
+        <h2>Analyser une page</h2>
+        <form class="form" action="/analyze" method="post" enctype="multipart/form-data">
+          <label class="form-field">
+            <span>Page à analyser (numéro dans le PDF Power BI)</span>
+            <div class="field-control">
+              <select id="page_number" name="page_number" required>
+                {% for p in pages %}
+                  <option value="{{ p.number }}">{{ p.label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </label>
+
+          <div class="prompt-preview-block">
+            <div class="prompt-preview-header">
+              <span class="prompt-preview-title">Prompt fixe de la page sélectionnée</span>
+              <div class="prompt-preview-actions">
+                <button type="button" class="btn secondary btn-sm" id="copy-prompt-btn">Copier</button>
+                <button type="button" class="btn secondary btn-sm" id="paste-prompt-btn">Coller ci-dessous</button>
+              </div>
+            </div>
+            <div class="field-control">
+              <div class="prompt-preview" id="fixed-prompt-display" tabindex="0" title="Sélectionnez tout (Ctrl+A) pour copier">{{ page_prompts['1'] }}</div>
+            </div>
+            <p class="hint">Ce prompt est utilisé par défaut. Copiez-le ou collez-le dans le champ personnalisé pour l’adapter.</p>
+          </div>
+
+          <label class="form-field">
+            <span>Prompt personnalisé (optionnel — remplace le prompt fixe si renseigné)</span>
+            <div class="field-control">
+              <textarea
+                id="custom-prompt"
+                name="prompt"
+                rows="8"
+                placeholder="Laissez vide pour utiliser le prompt fixe ci-dessus. Collez-y le prompt copié pour le modifier légèrement."
+              ></textarea>
+            </div>
+          </label>
+
+          <label class="form-field">
+            <span>Importer une capture (PNG/JPG) ou un PDF Power BI (6 pages)</span>
+            <div class="file-input-wrap">
+              <input type="file" name="file" accept=".png,.jpg,.jpeg,.pdf" required />
+            </div>
+          </label>
+          <p class="hint">
+            Pour un PDF exporté depuis Power BI, sélectionnez le numéro de page correspondant
+            (page 1 = Global, page 2 = Genre, etc.). Seule cette page sera analysée.
+          </p>
+
+          <button class="btn" type="submit">Lancer l’analyse</button>
+          <p class="hint">La clé API reste côté serveur (backend). Le PDF est généré localement.</p>
+        </form>
+      </section>
+    </div>
+
+    <script id="page-prompts-data" type="application/json">{{ page_prompts_json | safe }}</script>
+    <script>
+      (function () {
+        const pageSelect = document.getElementById("page_number");
+        const promptDisplay = document.getElementById("fixed-prompt-display");
+        const customPrompt = document.getElementById("custom-prompt");
+        const copyBtn = document.getElementById("copy-prompt-btn");
+        const pasteBtn = document.getElementById("paste-prompt-btn");
+        const pagePrompts = JSON.parse(document.getElementById("page-prompts-data").textContent);
+
+        function currentPrompt() {
+          return pagePrompts[pageSelect.value] || "";
+        }
+
+        function updateFixedPrompt() {
+          promptDisplay.textContent = currentPrompt();
+        }
+
+        async function copyPrompt() {
+          const text = currentPrompt();
+          try {
+            await navigator.clipboard.writeText(text);
+            copyBtn.textContent = "Copié !";
+            setTimeout(() => { copyBtn.textContent = "Copier"; }, 1500);
+          } catch {
+            const range = document.createRange();
+            range.selectNodeContents(promptDisplay);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            document.execCommand("copy");
+            copyBtn.textContent = "Copié !";
+            setTimeout(() => { copyBtn.textContent = "Copier"; }, 1500);
+          }
+        }
+
+        function pasteIntoCustom() {
+          customPrompt.value = currentPrompt();
+          customPrompt.focus();
+        }
+
+        pageSelect.addEventListener("change", updateFixedPrompt);
+        copyBtn.addEventListener("click", copyPrompt);
+        pasteBtn.addEventListener("click", pasteIntoCustom);
+        updateFixedPrompt();
+      })();
+    </script>
+  </body>
+</html>

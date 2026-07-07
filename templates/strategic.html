@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rapport Stratégique - Module IA</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <style>
+      .source-divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 8px 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .source-divider::before,
+      .source-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+      .badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        background: rgba(26, 58, 92, 0.10);
+        color: #1A3A5C;
+        border: 1px solid rgba(26, 58, 92, 0.18);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div class="brand">
+          <img class="logo" src="/static/logo.png" alt="Logo" />
+          <div class="brand-text">
+            <h1>Rapport Stratégique IA</h1>
+            <p class="subtitle">Analyse des KPIs et recommandations décisionnelles pour la direction.</p>
+          </div>
+        </div>
+        <div class="actions">
+          <a class="btn secondary" href="/">Analyse de page</a>
+        </div>
+      </header>
+
+      <section class="card">
+        <h2>Sélectionner un rapport à analyser <span class="badge">Aide à la décision</span></h2>
+        <form class="form" action="/strategic-analyze" method="post" enctype="multipart/form-data">
+
+          {% if existing_reports %}
+          <label>
+            <span>Rapport existant (généré par le module IA)</span>
+            <select name="existing_report">
+              <option value="">— Choisir un rapport —</option>
+              {% for r in existing_reports %}
+                <option value="{{ r }}">{{ r }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          {% else %}
+          <p class="hint">Aucun rapport disponible dans le dossier <code>/reports/</code>. Génère d'abord une analyse de page.</p>
+          {% endif %}
+
+          <div class="source-divider">ou importer un PDF externe</div>
+
+          <label>
+            <span>Importer un rapport PDF</span>
+            <input type="file" name="file" accept=".pdf" />
+          </label>
+
+          <button class="btn" type="submit" style="background: linear-gradient(180deg, rgba(26,58,92,0.95), rgba(15,35,60,0.95)); border-color: rgba(26,58,92,0.30);">
+            Générer le rapport stratégique
+          </button>
+          <p class="hint">Si un fichier est importé, il prend la priorité sur le rapport sélectionné.</p>
+        </form>
+      </section>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Résultat - Module IA</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div class="brand">
+          <img class="logo" src="/static/logo.png" alt="Logo" />
+          <div class="brand-text">
+            <h1>Résultat d’analyse</h1>
+            <p class="subtitle">Page analysée: <strong>{{ page_label }}</strong></p>
+          </div>
+        </div>
+        <div class="actions">
+          <a class="btn secondary" href="/">Nouvelle analyse</a>
+          <a class="btn secondary" href="/strategic">Rapport Stratégique</a>
+          <a class="btn" href="/reports/{{ pdf_filename }}">Télécharger PDF</a>
+        </div>
+      </header>
+
+      <section class="card">
+        <h2>Rapport (texte)</h2>
+        <pre class="report">{{ analysis_text }}</pre>
+      </section>
+    </div>
+  </body>
+</html>
+
